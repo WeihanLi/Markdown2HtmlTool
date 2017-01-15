@@ -32,6 +32,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.txtMdText = new System.Windows.Forms.RichTextBox();
             this.txtHtmlText = new System.Windows.Forms.RichTextBox();
+            this.cbGenerateMenu = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // label1
@@ -39,18 +40,18 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(13, 21);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(77, 12);
+            this.label1.Size = new System.Drawing.Size(53, 12);
             this.label1.TabIndex = 1;
-            this.label1.Text = "markdown内容";
+            this.label1.Text = "markdown";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(321, 21);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 12);
+            this.label2.Size = new System.Drawing.Size(29, 12);
             this.label2.TabIndex = 1;
-            this.label2.Text = "html内容";
+            this.label2.Text = "html";
             // 
             // txtMdText
             // 
@@ -69,17 +70,30 @@
             this.txtHtmlText.TabIndex = 2;
             this.txtHtmlText.Text = "";
             // 
+            // cbGenerateMenu
+            // 
+            this.cbGenerateMenu.AutoSize = true;
+            this.cbGenerateMenu.Checked = true;
+            this.cbGenerateMenu.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbGenerateMenu.Location = new System.Drawing.Point(13, 442);
+            this.cbGenerateMenu.Name = "cbGenerateMenu";
+            this.cbGenerateMenu.Size = new System.Drawing.Size(102, 16);
+            this.cbGenerateMenu.TabIndex = 3;
+            this.cbGenerateMenu.Text = "Generate Menu";
+            this.cbGenerateMenu.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(691, 438);
+            this.ClientSize = new System.Drawing.Size(691, 470);
+            this.Controls.Add(this.cbGenerateMenu);
             this.Controls.Add(this.txtHtmlText);
             this.Controls.Add(this.txtMdText);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Name = "Form1";
-            this.Text = "MD2HTMLTool";
+            this.Text = "Md2HtmlTool";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -90,6 +104,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.RichTextBox txtMdText;
         private System.Windows.Forms.RichTextBox txtHtmlText;
+        private System.Windows.Forms.CheckBox cbGenerateMenu;
     }
 }
 
