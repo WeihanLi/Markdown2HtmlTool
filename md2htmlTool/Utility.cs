@@ -143,7 +143,7 @@ namespace md2htmlTool
                 }
                 else
                 {
-                    return "http error";
+                    return "TRANSFER ERROR";
                 }
             }
             

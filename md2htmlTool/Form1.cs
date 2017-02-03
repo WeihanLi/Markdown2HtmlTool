@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace md2htmlTool
@@ -16,6 +17,8 @@ namespace md2htmlTool
         /// github markdown2html api接口请求地址
         /// </summary>
         private const string GithubMd2HtmlAPIUrl = "https://api.github.com/markdown";
+
+        private static LoadingForm loadingForm;
 
         public Form1()
         {
@@ -38,15 +41,59 @@ namespace md2htmlTool
             }
         }
 
+        /// <summary>
+        /// 修改html文本
+        /// </summary>
+        /// <param name="text">html文本</param>
+        private void ChangeHtmlText(string text)
+        {
+            this.txtHtmlText.Text = text;
+            if (!String.IsNullOrEmpty(text))
+            {
+                Clipboard.SetText(text);
+            }
+        }
+
         private void txtMdText_TextChanged(object sender, EventArgs e)
         {
             if (String.IsNullOrEmpty(txtMdText.Text))
             {
                 return;
             }
-            if (cbGenerateMenu.Checked)
+            string mdText = txtMdText.Text;
+            bool bGenerateMenu = cbGenerateMenu.Checked;
+            try
             {
-                MatchCollection matches = Regex.Matches(txtMdText.Text, TitlePattern, RegexOptions.Multiline | RegexOptions.ExplicitCapture);
+                string htmlText = "";
+                Thread loadingThread = new Thread(new ThreadStart(ShowLoadingLayer));
+                loadingThread.Start();
+
+                htmlText = GetResponseHtml(mdText, bGenerateMenu);
+                
+                loadingThread.Abort();
+
+                if (!htmlText.ToUpperInvariant().Equals("TRANSFER ERROR"))
+                {
+                    ChangeHtmlText(htmlText);
+                    MessageBox.Show("html copyed");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("发生异常，异常信息：" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 获取html
+        /// </summary>
+        /// <returns></returns>
+        private string GetResponseHtml(string mdText,bool bGenerateMenu)
+        {
+            string html = "";
+            if (bGenerateMenu)
+            {
+                MatchCollection matches = Regex.Matches(mdText, TitlePattern, RegexOptions.Multiline | RegexOptions.ExplicitCapture);
                 if (matches.Count > 0)
                 {
                     StringBuilder sbText = new StringBuilder();
@@ -68,33 +115,20 @@ namespace md2htmlTool
                         title = item.Groups["title"].Value.GenerateMenuItem(titleIndex);
                         sbText.AppendFormat("{0}[{1}](#{2}){3}", "\t".Multiple(level - 1), title, item.Groups["title"].Value.UrlEncode(), Environment.NewLine);
                     }
-                    txtMdText.Text = sbText + txtMdText.Text;
+                    mdText = sbText.Append(mdText).ToString();
                 }
             }
-            string mdText = txtMdText.Text;
-            try
+            //判断网络连接
+            if (Utility.GetInternetConnectedStatus())
             {
-                //判断网络连接
-                if (Utility.GetInternetConnectedStatus())
-                {
-                    //MessageBox.Show("网络已连接");
-                    var html = Markdown2HtmlByGithubAPI(mdText);
-                    txtHtmlText.Text = html;
-                }
-                else
-                {
-                    //MessageBox.Show("网络未连接");
-                    MarkdownSharp.Markdown md = new MarkdownSharp.Markdown();
-                    string htmlText = md.Transform(mdText);
-                    txtHtmlText.Text = htmlText;
-                }
-                Clipboard.SetText(txtHtmlText.Text);
-                MessageBox.Show("html copied");
+                html = Markdown2HtmlByGithubAPI(mdText);
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("发生异常，异常信息：" + ex.Message);
+                MarkdownSharp.Markdown md = new MarkdownSharp.Markdown();
+                html= md.Transform(mdText);
             }
+            return html;
         }
 
         /// <summary>
@@ -113,6 +147,21 @@ namespace md2htmlTool
             string requestJson = request.ToJson();
             byte[] requestBytes = Encoding.UTF8.GetBytes(requestJson);
             return Utility.DoHttpPost(GithubMd2HtmlAPIUrl, requestBytes);
+        }
+
+        /// <summary>
+        /// 显示loading层
+        /// </summary>
+        private void ShowLoadingLayer()
+        {
+            if (loadingForm == null)
+            {
+                loadingForm = new LoadingForm
+                {
+                    StartPosition = FormStartPosition.WindowsDefaultLocation
+                };
+            }
+            loadingForm.ShowDialog();
         }
     }
 }
