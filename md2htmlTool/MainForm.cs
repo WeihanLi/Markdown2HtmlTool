@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace md2htmlTool
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         /// <summary>
         /// 标题正则
@@ -20,7 +20,7 @@ namespace md2htmlTool
 
         private static LoadingForm loadingForm;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             Init();
@@ -66,10 +66,10 @@ namespace md2htmlTool
             {
                 string htmlText = "";
                 Thread loadingThread = new Thread(new ThreadStart(ShowLoadingLayer));
+                loadingThread.IsBackground = true;//设置为后台线程
+                loadingThread.Name = "md2html_loading_thread";
                 loadingThread.Start();
-
                 htmlText = GetResponseHtml(mdText, bGenerateMenu);
-                
                 loadingThread.Abort();
 
                 if (!htmlText.ToUpperInvariant().Equals("TRANSFER ERROR"))
